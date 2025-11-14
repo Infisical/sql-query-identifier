@@ -8,7 +8,10 @@ import (
 	regexp "github.com/wasilibs/go-re2"
 )
 
-const eof = rune(-1)
+const (
+	eof                 = rune(-1)
+	maxRegexInputLength = 1024
+)
 
 var keywords = make(map[string]bool)
 
@@ -242,6 +245,9 @@ func getCustomParam(state *State, paramTypes *ParamTypes) string {
 		return ""
 	}
 	remainingInput := string(state.Input[state.Start:])
+	if len(remainingInput) > maxRegexInputLength {
+		return ""
+	}
 	for _, r := range paramTypes.Custom {
 		re := regexp.MustCompile("^(?:" + r + ")")
 		match := re.FindString(remainingInput)
@@ -459,6 +465,10 @@ func isString(ch rune, dialect Dialect) bool {
 
 func isCustomParam(state *State, paramTypes *ParamTypes) bool {
 	remainingInput := string(state.Input[state.Start:])
+	if len(remainingInput) > maxRegexInputLength {
+		return false
+	}
+
 	for _, r := range paramTypes.Custom {
 		re := regexp.MustCompile("^(?:" + r + ")")
 		if re.MatchString(remainingInput) {
