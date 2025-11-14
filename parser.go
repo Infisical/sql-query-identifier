@@ -2,9 +2,10 @@ package sqlqueryidentifier
 
 import (
 	"fmt"
-	"regexp"
 	"slices"
 	"strings"
+
+	regexp "github.com/wasilibs/go-re2"
 )
 
 type StatementParser interface {

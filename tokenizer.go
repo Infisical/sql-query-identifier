@@ -1,10 +1,11 @@
 package sqlqueryidentifier
 
 import (
-	"regexp"
 	"slices"
 	"strings"
 	"unicode"
+
+	regexp "github.com/wasilibs/go-re2"
 )
 
 const eof = rune(-1)
@@ -272,7 +273,14 @@ func scanParameter(state *State, dialect Dialect, paramTypes *ParamTypes) Token 
 			}
 
 			if len(potentialNumberStr) > 0 {
-				isAllDigits, _ := regexp.MatchString(`^\d+$`, potentialNumberStr)
+				isAllDigits := true
+				for _, r := range potentialNumberStr {
+					if !unicode.IsDigit(r) {
+						isAllDigits = false
+						break
+					}
+				}
+
 				if isAllDigits {
 					for i := 0; i < len([]rune(potentialNumberStr)); i++ {
 						read(state, 0)
